@@ -16,8 +16,8 @@
 function set_variables() {
 # Customize the installation by setting these variables:
 vm_name="macOS"                  # name of the VirtualBox virtual machine
-macOS_release_name="Catalina"    # install "HighSierra" "Mojave" or "Catalina"
-storage_size=80000               # VM disk image size in MB, minimum 22000
+macOS_release_name="BigSur"      # install "HighSierra" "Mojave" "Catalina" "BigSur"
+storage_size=40000               # VM disk image size in MB, minimum 22000
 storage_format="vdi"             # VM disk image file format, "vdi" or "vmdk"
 cpu_count=2                      # VM CPU cores, minimum 2
 memory_size=4096                 # VM RAM in MB, minimum 2048
@@ -86,7 +86,7 @@ function pad_to_33_chars() {
 
 # custom settings prompt
 echo -e "\nvm_name=\"${vm_name}\""
-pad_to_33_chars "macOS_release_name=\"${macOS_release_name}\"" "# install \"HighSierra\" \"Mojave\" \"Catalina\""
+pad_to_33_chars "macOS_release_name=\"${macOS_release_name}\"" "# install \"HighSierra\" \"Mojave\" \"Catalina\" \"BigSur\""
 pad_to_33_chars "storage_size=${storage_size}"                 "# VM disk image size in MB. minimum 22000"
 pad_to_33_chars "storage_format=\"${storage_format}\""         "# VM disk image file format, \"vdi\" or \"vmdk\""
 pad_to_33_chars "cpu_count=${cpu_count}"                       "# VM CPU cores, minimum 2"
@@ -320,17 +320,22 @@ fi
 HighSierra_sucatalog='https://swscan.apple.com/content/catalogs/others/index-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog'
 Mojave_sucatalog='https://swscan.apple.com/content/catalogs/others/index-10.14-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog'
 Catalina_sucatalog='https://swscan.apple.com/content/catalogs/others/index-10.15-10.14-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog'
-if [[ "${macOS_release_name:0:1}" =~ [Cc] ]]; then
+BigSur_sucatalog='https://swscan.apple.com/content/catalogs/others/index-10.16seed-10.16-10.15-10.14-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog'
+if [[ "${macOS_release_name:0:1}" =~ [Cc] ]] || [[ "${macOS_release_name:0:1}" =~ [Bb] ]]; then
     if [[ ! ( "${vbox_version:0:1}" -gt 6 ||
               "${vbox_version}" =~ ^6\.1\.[4-9] ||
               "${vbox_version}" =~ ^6\.1\.[123][0-9] ||
               "${vbox_version}" =~ ^6\.[2-9] ) ]]; then
-        echo -e "\nmacOS Catalina requires VirtualBox version 6.1.4 or higher."
+        echo -e "\nmacOS Catalina and BigSur requires VirtualBox version 6.1.4 or higher."
         echo "Exiting."
         exit
     fi
 fi
-if [[ "${macOS_release_name:0:1}" =~ [Cc] ]]; then
+if [[ "${macOS_release_name:0:1}" =~ [Bb] ]]; then
+    macOS_release_name="BigSur"
+    CFBundleShortVersionString="10.16"
+    sucatalog="${BigSur_sucatalog}"
+elif [[ "${macOS_release_name:0:1}" =~ [Cc] ]]; then
     macOS_release_name="Catalina"
     CFBundleShortVersionString="10.15"
     sucatalog="${Catalina_sucatalog}"
@@ -850,7 +855,11 @@ if [[ -w "${vm_name}.${storage_format}" ]]; then
         exit
     fi
 fi
-if [[ "${macOS_release_name}" = "Catalina" && "${storage_size}" -lt 25000 ]]; then
+if [[ "${macOS_release_name}" = "BigSur" && "${storage_size}" -lt 25000 ]]; then
+    echo "Attempting to install macOS BigSur on a disk smaller than 25000MB will fail."
+    echo "Please assign a larger virtual disk image size. Exiting."
+    exit
+elif [[ "${macOS_release_name}" = "Catalina" && "${storage_size}" -lt 25000 ]]; then
     echo "Attempting to install macOS Catalina on a disk smaller than 25000MB will fail."
     echo "Please assign a larger virtual disk image size. Exiting."
     exit
@@ -1013,7 +1022,7 @@ echo -ne "\n        ${highlight_color}NAME${default_color}
 Push-button installer of macOS on VirtualBox
 
         ${highlight_color}DESCRIPTION${default_color}
-The script downloads macOS High Sierra, Mojave, and Catalina from Apple servers
+The script downloads macOS High Sierra, Mojave, Catalina and BigSur from Apple servers
 and installs them on VirtualBox 5.2, 6.0, and 6.1. The script doesn't install
 any closed-source additions or bootloaders. A default install requires the user
 press enter when prompted, less than ten times, to complete the installation.
