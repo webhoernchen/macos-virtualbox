@@ -15,14 +15,14 @@
 
 function set_variables() {
 # Customize the installation by setting these variables:
-vm_name="macOS"                  # name of the VirtualBox virtual machine
-macOS_release_name="BigSur"      # install "HighSierra" "Mojave" "Catalina" "BigSur"
-storage_size=40000               # VM disk image size in MB, minimum 22000
-storage_format="vdi"             # VM disk image file format, "vdi" or "vmdk"
-cpu_count=2                      # VM CPU cores, minimum 2
-memory_size=4096                 # VM RAM in MB, minimum 2048
-gpu_vram=128                     # VM video RAM in MB, minimum 34, maximum 128
-resolution="1280x800"            # VM display resolution
+macOS_release_name="${1:-Catalina}"    # install "HighSierra" "Mojave" "Catalina" "BigSur"
+vm_name="macOS${macOS_release_name}"   # name of the VirtualBox virtual machine
+storage_size=80000                     # VM disk image size in MB, minimum 22000
+storage_format="vdi"                   # VM disk image file format, "vdi" or "vmdk"
+cpu_count=2                            # VM CPU cores, minimum 2
+memory_size=4096                       # VM RAM in MB, minimum 2048
+gpu_vram=128                           # VM video RAM in MB, minimum 34, maximum 128
+resolution="1280x800"                  # VM display resolution
 
 # The following commented commands, when executed on a genuine Mac,
 # may provide the values for NVRAM and EFI parameters required by iCloud,
